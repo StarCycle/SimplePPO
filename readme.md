@@ -20,6 +20,8 @@ During training, the output will be recorded in a `runs` folder. You can visuali
 
  - `env.py` contains a "filling grid" environment. There are several grids. If the agent fills a blank grid, it will receive a reward of +1, otherwise the reward will be -1.
  - When you use multiple GPUs, the number of GPUs should be smaller or equal to the number of parallel environments.
+ - I am using `gym.vector.AsyncVectorEnv` to create parallel environments with multiprocessing. However, debugging a  multiprocessing program is complicated. Thus, I advise you to switch to `gym.vector.SyncVectorEnv` during debugging, which only uses multithreading.
+ - Current multi-GPU capability can work but is quite slow. I will improve it.
 
 ### Citation
 
