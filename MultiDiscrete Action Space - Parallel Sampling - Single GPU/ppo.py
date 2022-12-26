@@ -7,7 +7,6 @@ from torch.distributions.categorical import Categorical
 from torch.utils.tensorboard import SummaryWriter
 import gym
 from env import Grid1DEnv
-import pdb
 
 def layer_init(layer, std=np.sqrt(2), bias_const=0.0):
     torch.nn.init.orthogonal_(layer.weight, std)
@@ -75,7 +74,7 @@ def train(envs, name, num_envs, action_space, target_kl, minibatch_size, gamma, 
     rewards = torch.zeros((num_env_steps, num_envs)).to(device)
     dones = torch.zeros((num_env_steps, num_envs)).to(device)
     values = torch.zeros((num_env_steps, num_envs)).to(device)
-    next_obs = torch.Tensor(envs.reset()).to(device) 
+    next_obs = torch.Tensor(envs.reset()[0]).to(device) 
     next_done = torch.zeros(num_envs).to(device)	
 
     global_step = 0
@@ -96,7 +95,7 @@ def train(envs, name, num_envs, action_space, target_kl, minibatch_size, gamma, 
             logprobs[step] = logprob
 
             # execute the game and log data.
-            next_obs, reward, done, info = envs.step(action.cpu()) 
+            next_obs, reward, done, _, info = envs.step(action.cpu()) 
             cumu_rewards += reward
             for i in range(num_envs):
                 if done[i] == True:
@@ -185,9 +184,9 @@ def train(envs, name, num_envs, action_space, target_kl, minibatch_size, gamma, 
         writer.add_scalar("mean_value", values.mean().item(), global_step)
     writer.close()
 
-def make_env(grid_size, action_space, num_epoch_steps):
+def make_env(seed, grid_size, action_space, num_epoch_steps):
     def thunk():
-        env = Grid1DEnv(grid_size, action_space, num_epoch_steps)
+        env = Grid1DEnv(seed, grid_size, action_space, num_epoch_steps)
         return env
     return thunk
 
@@ -209,8 +208,7 @@ if __name__ == "__main__":
     env_seed = 1		
 
     envs = gym.vector.AsyncVectorEnv(
-	[make_env(grid_size, action_space, num_epoch_steps) for i in range(num_envs)])
-    envs.seed(env_seed) 
+	[make_env(env_seed+i, grid_size, action_space, num_epoch_steps) for i in range(num_envs)])
 
     # Grid search of part of hyperparameters
     for tk in target_kl:

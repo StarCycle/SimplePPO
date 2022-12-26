@@ -75,7 +75,7 @@ def train(env, name, action_space, target_kl, minibatch_size, gamma, ent_coef, v
     rewards = torch.zeros(num_env_steps).to(device)
     dones = torch.zeros(num_env_steps).to(device)
     values = torch.zeros(num_env_steps).to(device)
-    next_obs = torch.Tensor(env.reset()).to(device)
+    next_obs = torch.Tensor(env.reset()[0]).to(device)
     next_done = torch.zeros(1).to(device)
 
     global_step = 0
@@ -97,7 +97,7 @@ def train(env, name, action_space, target_kl, minibatch_size, gamma, ent_coef, v
             logprobs[step] = logprob
 
             # execute the game and log data.
-            next_obs, reward, done, info = env.step(action.cpu()) 
+            next_obs, reward, done, _, info = env.step(action.cpu()) 
             cumu_rewards += reward
             if done == True:
                 writer.add_scalar("cumulative rewards", cumu_rewards, global_step)
@@ -198,11 +198,9 @@ if __name__ == "__main__":
     learning_rate = [5e-4]
     num_epoch_steps = 8
     grid_size = 16
-    action_space = [16, 16]	# Action 1 can be selected from [0,15], action 2 from [0,15]
-    env_seed = 1		
+    action_space = [16, 16]	# Action 1 can be selected from [0,15], action 2 from [0,15]	
 
     env = Grid1DEnv(grid_size, action_space, num_epoch_steps)
-    env.seed(env_seed)
 
     # Grid search of part ofhyper parameters
     for tk in target_kl:

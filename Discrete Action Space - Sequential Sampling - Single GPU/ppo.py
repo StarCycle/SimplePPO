@@ -71,7 +71,7 @@ def train(env, name, target_kl, minibatch_size, gamma, ent_coef, vf_coef, num_nn
     rewards = torch.zeros(num_env_steps).to(device)
     dones = torch.zeros(num_env_steps).to(device)
     values = torch.zeros(num_env_steps).to(device)
-    next_obs = torch.Tensor(env.reset()).to(device)
+    next_obs = torch.Tensor(env.reset()[0]).to(device)
     next_done = torch.zeros(1).to(device)
 
     global_step = 0
@@ -92,7 +92,7 @@ def train(env, name, target_kl, minibatch_size, gamma, ent_coef, vf_coef, num_nn
             logprobs[step] = logprob
 
             # execute the game and log data.
-            next_obs, reward, done, info = env.step(action.cpu()) 
+            next_obs, reward, done, _, info = env.step(action.cpu()) 
             cumu_rewards += reward
             if done == True:
                 writer.add_scalar("cumulative rewards", cumu_rewards, global_step)

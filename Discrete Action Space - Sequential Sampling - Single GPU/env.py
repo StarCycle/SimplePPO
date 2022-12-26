@@ -31,7 +31,7 @@ class Grid1DEnv(gym.Env):
     self.state = [0]*len(self.state)
     self.state[random.randrange(0, len(self.state))] = 1
     self.current_step = 0
-    return np.array([self.state]).astype(np.float32)
+    return self.state, {}
 
   def step(self, action):
     if action < 0 or action >= len(self.state):
@@ -40,5 +40,6 @@ class Grid1DEnv(gym.Env):
     self.state[action] = 1
     self.current_step += 1
     if self.current_step >= self.max_num_steps:
-        return self.reset(), reward, True, {}
-    return np.array([self.state]).astype(np.float32), reward, False, {}
+        self.reset()
+        return self.state, reward, True, None, {}
+    return self.state, reward, False, None, {}

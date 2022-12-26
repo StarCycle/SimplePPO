@@ -10,8 +10,9 @@ class Grid1DEnv(gym.Env):
   If the RL agent fill a blank grid, it gets a reward of +1, otherwise the reward is -1
   """
 
-  def __init__(self, grid_size, action_space, num_epoch_steps):
+  def __init__(self, seed, grid_size, action_space, num_epoch_steps):
     super(Grid1DEnv, self).__init__()
+    random.seed(seed)
     self.max_num_steps = num_epoch_steps
     self.current_step = 0
 
@@ -21,9 +22,6 @@ class Grid1DEnv(gym.Env):
     self.action_space = spaces.MultiDiscrete(action_space)
     self.observation_space = spaces.Box(low=0, high=grid_size,shape=(grid_size,), dtype=np.float32)
 
-  def seed(self, seed):
-    random.seed(seed)
-
   def reset(self):
     """
     Important: the observation must be a numpy array
@@ -31,7 +29,7 @@ class Grid1DEnv(gym.Env):
     self.state = [0]*len(self.state)
     self.state[random.randrange(0, len(self.state))] = 1
     self.current_step = 0
-    return self.state
+    return self.state, {}
 
   def step(self, action):
     reward = 0
@@ -43,5 +41,6 @@ class Grid1DEnv(gym.Env):
         reward -= 1
     self.current_step += 1
     if self.current_step >= self.max_num_steps:
-        return self.reset(), reward, True, {}
-    return self.state, reward, False, {}
+        self.reset()
+        return self.state, reward, True, None, {}
+    return self.state, reward, False, None, {}
