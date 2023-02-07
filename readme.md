@@ -22,6 +22,7 @@ During training, the output will be recorded in a `runs` folder. You can visuali
  - When you use multiple GPUs, the number of GPUs should be smaller or equal to the number of parallel environments.
  - I am using `gym.vector.AsyncVectorEnv` to create parallel environments with multiprocessing. However, debugging a  multiprocessing program is complicated. Thus, I advise you to switch to `gym.vector.SyncVectorEnv` during debugging, which only uses multithreading.
  - Current multi-GPU capability can work but is quite slow. I will improve it.
+ - New: PPO+Transformer is based on "MultiDiscrete Action Space - Sequential Sampling - Single GPU" configuration. It's a dirty implementation but does work.
 
 ### Citation
 
